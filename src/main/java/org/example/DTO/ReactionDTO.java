@@ -1,7 +1,7 @@
 package org.example.DTO;
 
 import lombok.*;
-import org.example.Entity.ReactionType;
+import org.example.entity.ReactionType;
 
 @Getter
 @Setter
