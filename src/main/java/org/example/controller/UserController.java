@@ -1,8 +1,11 @@
 package org.example.controller;
 
 import org.example.DTO.AuthenticationResponse;
+import org.example.DTO.StatusUpdateDTO;
 import org.example.DTO.UserDTO;
+import org.example.entity.StatusUpdate;
 import org.example.entity.User;
+import org.example.services.StatusUpdateService;
 import org.example.services.UserServices;
 import org.example.utils.JwtUtil;
 import org.example.utils.UserMapper;
@@ -19,6 +22,9 @@ import java.util.stream.Collectors;
 public class UserController {
     @Autowired
     private UserServices userService;
+
+    @Autowired
+    private StatusUpdateService statusUpdateService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -75,5 +81,14 @@ public class UserController {
         } else {
             return ResponseEntity.status(401).build(); // Unauthorized
         }
+    }
+    // Endpoint to get all relevant status updates
+    @GetMapping("/{id}/home")
+    public ResponseEntity<List<StatusUpdateDTO>> getUserHomePage(@PathVariable Long id) {
+        List<StatusUpdate> statusUpdates = statusUpdateService.getAllRelevantStatusUpdates(id);
+        List<StatusUpdateDTO> statusUpdateDTOs = statusUpdates.stream()
+                .map(UserMapper::toStatusUpdateDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(statusUpdateDTOs);
     }
 }

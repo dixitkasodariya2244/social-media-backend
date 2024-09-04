@@ -74,7 +74,7 @@ public class UserMapper {
         return user;
     }
 
-    private static StatusUpdateDTO toStatusUpdateDTO(StatusUpdate update) {
+    public static StatusUpdateDTO toStatusUpdateDTO(StatusUpdate update) {
         StatusUpdateDTO statusUpdateDTO = new StatusUpdateDTO();
         statusUpdateDTO.setId(update.getId());
         statusUpdateDTO.setText(update.getText());

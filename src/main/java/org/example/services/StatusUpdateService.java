@@ -39,5 +39,8 @@ public class StatusUpdateService {
         Optional<User> userOptional = userRepository.findById(userId);
         return userOptional.map(user -> new ArrayList<>(user.getStatusUpdates())).orElse(null);
     }
-
+    // Fetch all relevant status updates
+    public List<StatusUpdate> getAllRelevantStatusUpdates(Long userId) {
+        return userRepository.findAllRelevantStatusUpdates(userId);
+    }
 }
