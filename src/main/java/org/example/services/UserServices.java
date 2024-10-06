@@ -105,5 +105,8 @@ public class UserServices implements UserDetailsService {
             throw new UsernameNotFoundException("User not found with email: " + email);
         }
     }
-
+    // Add a method to find users by name
+    public List<User> findUsersByName(String name) {
+        return userRepository.findByNameContainingIgnoreCase(name);
+    }
 }

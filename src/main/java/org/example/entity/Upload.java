@@ -36,4 +36,8 @@ public class Upload {
     @Lob
     @Column(name = "imagedata", columnDefinition = "LONGBLOB")
     private byte[] imageData;
+
+    @ManyToOne
+    @JoinColumn(name = "status_update_id", nullable = true)
+    private StatusUpdate statusUpdate;
 }

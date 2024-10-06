@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import org.example.DTO.AuthenticationResponse;
+import org.example.DTO.LoginRequestDTO;
 import org.example.DTO.StatusUpdateDTO;
 import org.example.DTO.UserDTO;
 import org.example.entity.StatusUpdate;
@@ -28,6 +29,7 @@ public class UserController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<User> users = userService.getAllUsers();
@@ -37,7 +39,7 @@ public class UserController {
         return ResponseEntity.ok(userDTOs);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/profile")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         Optional<User> user = userService.getUserById(id);
         return user.map(UserMapper::toDTO)
@@ -70,25 +72,61 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody UserDTO userDTO) {
-        Optional<User> loggedInUser = userService.loginUser(userDTO.getEmail(), userDTO.getPassword());
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest) {
+        Optional<User> loggedInUser = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
 
         if (loggedInUser.isPresent()) {
             User user = loggedInUser.get();
             String token = jwtUtil.generateToken(user.getEmail());
 
-            return ResponseEntity.ok(new AuthenticationResponse(token)); // Create an AuthenticationResponse class with a `token` field
+            return ResponseEntity.ok(new AuthenticationResponse(token, user.getId())); // Create an AuthenticationResponse class with a `token` field
         } else {
             return ResponseEntity.status(401).build(); // Unauthorized
         }
     }
     // Endpoint to get all relevant status updates
+//    @GetMapping("/{id}/home")
+//    public ResponseEntity<List<StatusUpdateDTO>> getUserHomePage(@PathVariable Long id) {
+//        List<StatusUpdate> statusUpdates = statusUpdateService.getAllRelevantStatusUpdates(id);
+//        List<StatusUpdateDTO> statusUpdateDTOs = statusUpdates.stream()
+//                .map(UserMapper::toStatusUpdateDTO)
+//                .collect(Collectors.toList());
+//        return ResponseEntity.ok(statusUpdateDTOs);
+//    }
+
     @GetMapping("/{id}/home")
-    public ResponseEntity<List<StatusUpdateDTO>> getUserHomePage(@PathVariable Long id) {
-        List<StatusUpdate> statusUpdates = statusUpdateService.getAllRelevantStatusUpdates(id);
-        List<StatusUpdateDTO> statusUpdateDTOs = statusUpdates.stream()
-                .map(UserMapper::toStatusUpdateDTO)
+    public ResponseEntity<UserDTO> getUserHomePage(@PathVariable Long id) {
+        // Get user by ID, including friends and status updates
+        Optional<User> userOptional = userService.getUserByIdWithStatusUpdates(id);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            // Convert User entity to UserDTO
+            UserDTO userDTO = UserMapper.toDTO(user);
+
+            return ResponseEntity.ok(userDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    //    @GetMapping("/top-profiles")
+//    public ResponseEntity<List<UserDTO>> getTopProfiles() {
+//        // Assuming you have a method in userService to get top profiles
+//        List<User> users = userService.getTopProfiles();
+//        List<UserDTO> userDTOs = users.stream()
+//                .map(UserMapper::toDTO)
+//                .collect(Collectors.toList());
+//        return ResponseEntity.ok(userDTOs);
+//    }
+// Endpoint to search users by name
+    @GetMapping("/search")
+    public ResponseEntity<List<UserDTO>> searchUsersByName(@RequestParam String name) {
+        List<User> users = userService.findUsersByName(name);
+        List<UserDTO> userDTOs = users.stream()
+                .map(UserMapper::toDTO)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(statusUpdateDTOs);
+        return ResponseEntity.ok(userDTOs);
     }
 }

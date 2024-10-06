@@ -15,8 +15,10 @@ import java.util.List;
 public class StatusUpdateDTO {
     private Long id;
     private String text;
+    private String imageUrl;
     private LocalDateTime timestamp;
-//    // Add this line to include uploaded files
-//    private List<UploadDTO> uploads;
-
+    private Long userId; // ID of the user who created the status
+    private UploadDTO uploads;   // List of associated uploads
+    private List<CommentDTO> comments; // List of associated comments
+    private List<ReactionDTO> reactions; // List of associated reactions
 }

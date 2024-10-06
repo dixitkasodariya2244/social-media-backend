@@ -41,8 +41,55 @@ public class UploadController {
     @GetMapping("/{userId}/download/{fileName}")
     public ResponseEntity<?> downloadImage(@PathVariable Long userId, @PathVariable String fileName) {
         byte[] imageData = uploadingService.downloadImage(userId, fileName);
+
+        // Extract the file extension (e.g., jpg, png) to determine the media type
+        String fileExtension = getFileExtension(fileName).toLowerCase();
+        MediaType mediaType = getMediaTypeForFileExtension(fileExtension);
+
+        // If the file extension is not recognized, return an error response (optional)
+        if (mediaType == null) {
+            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                    .body("Unsupported file type: " + fileExtension);
+        }
+
         return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.valueOf("image/png"))  // Adjust content type based on the actual image type
+                .contentType(getMediaTypeForFileExtension(getFileExtension(fileName)))
+                .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                .header("Pragma", "no-cache")
+                .header("Expires", "0")
                 .body(imageData);
     }
+
+    // Utility method to extract file extension
+    private String getFileExtension(String fileName) {
+        if (fileName == null || fileName.lastIndexOf(".") == -1) {
+            return null;
+        }
+        return fileName.substring(fileName.lastIndexOf(".") + 1);
+    }
+
+    // Utility method to map file extensions to media types
+    private MediaType getMediaTypeForFileExtension(String extension) {
+        switch (extension) {
+            case "png":
+                return MediaType.IMAGE_PNG;
+            case "jpg":
+            case "jpeg":
+                return MediaType.IMAGE_JPEG;
+            case "gif":
+                return MediaType.IMAGE_GIF;
+            default:
+                return null; // Unsupported file type
+        }
+    }
+
+//    @PostMapping("/{userId}/delete/{fileName}")
+//    public ResponseEntity<?> deleteImage(@PathVariable Long userId, @PathVariable String fileName) {
+//        boolean isDeleted = uploadingService.deleteImage(userId, fileName);
+//        if (isDeleted) {
+//            return ResponseEntity.ok("Image deleted successfully.");
+//        } else {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image not found.");
+//        }
+//    }
 }

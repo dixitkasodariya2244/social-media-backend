@@ -3,6 +3,7 @@ package org.example.utils;
 import org.example.DTO.*;
 import org.example.entity.Reaction;
 import org.example.entity.StatusUpdate;
+import org.example.entity.Upload;
 import org.example.entity.User;
 
 import java.util.*;
@@ -18,7 +19,8 @@ public class UserMapper {
         dto.setPhone(user.getPhone());
         dto.setGender(user.getGender());
         dto.setAddress(user.getAddress());
-        dto.setPassword(user.getPassword());
+
+//        dto.setPassword(user.getPassword());
 
         //get statusUpdates
         List<StatusUpdateDTO> statusUpdates = Optional.ofNullable(user.getStatusUpdates())
@@ -54,12 +56,23 @@ public class UserMapper {
                 .map(UserMapper::toFollowingDTO)
                 .collect(Collectors.toSet());
         dto.setFollowing(following);
-
+        int numberOfFriends = Optional.ofNullable(user.getFriends())
+                .map(Set::size)
+                .orElse(0);
+        dto.setNumberOfFriends(numberOfFriends);
+        int numberOfFollowers = Optional.ofNullable(user.getFollowers())
+                .map(Set::size)
+                .orElse(0);
+        dto.setNumberOfFollowers(numberOfFollowers);
+        int numberOfFollowing = Optional.ofNullable(user.getFollowing())
+                .map(Set::size)
+                .orElse(0);
+        dto.setNumberOfFollowing(numberOfFollowing);
         return dto;
     }
     public static User toEntity(UserDTO dto) {
         User user = new User();
-        user.setId(dto.getId());
+//        user.setId(dto.getId());
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setAge(dto.getAge());
@@ -79,7 +92,20 @@ public class UserMapper {
         statusUpdateDTO.setId(update.getId());
         statusUpdateDTO.setText(update.getText());
         statusUpdateDTO.setTimestamp(update.getTimestamp());
+        if (update.getUploads() != null) {
+            UploadDTO uploadDTO = toUpdateDTO(update.getUploads());
+            statusUpdateDTO.setUploads(uploadDTO);
+        }
         return statusUpdateDTO;
+    }
+    public static UploadDTO toUpdateDTO(Upload update) {
+        UploadDTO updateDTO = new UploadDTO();
+        updateDTO.setId(update.getId());
+        updateDTO.setFileName(update.getFileName());
+        updateDTO.setFileUrl(update.getFileUrl());
+        updateDTO.setFileType(update.getFileType());
+
+        return updateDTO;
     }
 
     private static FriendDTO toFriendDTO(User friend) {

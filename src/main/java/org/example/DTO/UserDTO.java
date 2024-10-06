@@ -34,4 +34,9 @@ public class UserDTO {
 
         // For the set of followers
         private Set<FollowerDTO> followers;
+
+        // Add fields to store the count of friends, followers, and following
+        private int numberOfFriends;
+        private int numberOfFollowers;
+        private int numberOfFollowing;
 }

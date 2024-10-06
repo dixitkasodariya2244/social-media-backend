@@ -27,11 +27,17 @@ public class UploadingService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
 
-            String fileName = file.getOriginalFilename();
+//
+//            String fileName = file.getOriginalFilename();
+//            String fileType = file.getContentType();
+
+            // Generate a unique filename
+            String uniqueFileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             String fileType = file.getContentType();
             Upload uploadData = uploadRepository.save(Upload.builder()
-                    .fileName(fileName)
+                    .fileName(uniqueFileName)
                     .fileType(fileType)
+                    .fileUrl("/"+ userId + "/download/" + uniqueFileName)
                     .uploadedAt(new Date())
                     .user(user)
                     .imageData(UploadUtils.compressImage(file.getBytes())).build());
@@ -46,14 +52,36 @@ public class UploadingService {
     }
 
     //downloading images with user id
+//    public byte[] downloadImage(Long userId, String fileName) {
+//        Optional<Upload> uploadOptional = uploadRepository.findById(userId);
+//        if (uploadOptional.isPresent()) {
+//            byte[] images = UploadUtils.decompressImage(uploadOptional.get().getImageData());
+//            return images;
+//        }else {
+//            // Handle the case where the image is not found or does not belong to the user
+//            throw new RuntimeException("Image not found for this user");
+//        }
+//    }
     public byte[] downloadImage(Long userId, String fileName) {
-        Optional<Upload> uploadOptional = uploadRepository.findById(userId);
+        Optional<Upload> uploadOptional = uploadRepository.findByUserIdAndFileName(userId, fileName); // Update query
         if (uploadOptional.isPresent()) {
             byte[] images = UploadUtils.decompressImage(uploadOptional.get().getImageData());
             return images;
-        }else {
-            // Handle the case where the image is not found or does not belong to the user
+        } else {
             throw new RuntimeException("Image not found for this user");
         }
     }
+//    // Method to delete a file
+    public void deleteFile(Long uploadId) {
+        Optional<Upload> uploadOptional = uploadRepository.findById(uploadId);
+        if (uploadOptional.isPresent()) {
+            // Optionally delete the physical file from the file system here
+            // File file = new File(uploadOptional.get().getFileUrl());
+            // file.delete();
+
+            // Delete the upload record from the database
+            uploadRepository.deleteById(uploadId);
+        }
+    }
+
 }

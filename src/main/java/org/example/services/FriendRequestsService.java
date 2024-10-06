@@ -1,81 +1,132 @@
 package org.example.services;
 
+import org.example.DTO.FriendRequestDTO;
+import org.example.DTO.UserDTO;
+import org.example.entity.FriendRequest;
 import org.example.entity.User;
+import org.example.repository.FriendRequestRepository;
 import org.example.repository.UserRepository;
+import org.example.utils.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class FriendRequestsService {
+
+    @Autowired
+    private FriendRequestRepository friendRequestRepository;
+
     @Autowired
     private UserRepository userRepository;
 
-    // Send a friend request
     public boolean sendFriendRequest(Long senderId, Long receiverId) {
-        Optional<User> senderOpt = userRepository.findById(senderId);
-        Optional<User> receiverOpt = userRepository.findById(receiverId);
+        User sender = userRepository.findById(senderId).orElse(null);
+        User receiver = userRepository.findById(receiverId).orElse(null);
 
-        if (senderOpt.isPresent() && receiverOpt.isPresent()) {
-            User sender = senderOpt.get();
-            User receiver = receiverOpt.get();
-
-            if (sender.getFriends().contains(receiver)) {
-                return false; // Already friends
-            }
-
-            sender.getSentFriendRequests().add(receiver);
-            receiver.getReceivedFriendRequests().add(sender);
-
-            userRepository.save(sender);
-            userRepository.save(receiver);
+        if (sender != null && receiver != null) {
+            FriendRequest request = new FriendRequest(sender, receiver, "pending");
+            friendRequestRepository.save(request);
             return true;
         }
         return false;
     }
 
-    // Accept a friend request
-    public boolean acceptFriendRequest(Long userId, Long senderId) {
-        Optional<User> userOpt = userRepository.findById(userId);
-        Optional<User> senderOpt = userRepository.findById(senderId);
+    public List<FriendRequestDTO> getPendingRequests(Long userId) {
+        List<FriendRequest> requests = friendRequestRepository.findByReceiverIdAndStatus(userId, "pending");
 
-        if (userOpt.isPresent() && senderOpt.isPresent()) {
-            User user = userOpt.get();
-            User sender = senderOpt.get();
+        // Map to DTO
+        return requests.stream()
+                .map(request -> new FriendRequestDTO(
+                        request.getId(),
+                        request.getSender().getId(),
+                        request.getSender().getName(),
+                        request.getReceiver().getId(),
+                        request.getStatus()))
+                .collect(Collectors.toList());
+    }
 
-            if (user.getReceivedFriendRequests().contains(sender)) {
-                user.getFriends().add(sender);
-                sender.getFriends().add(user);
+    //    public boolean acceptFriendRequest(Long requestId) {
+//        FriendRequest request = friendRequestRepository.findById(requestId).orElse(null);
+//        if (request != null) {
+//            request.setStatus("accepted");
+//            friendRequestRepository.save(request);
+//            return true;
+//        }
+//        return false;
+//    }
+    public boolean acceptFriendRequest(Long requestId) {
+        FriendRequest request = friendRequestRepository.findById(requestId).orElse(null);
+        if (request != null) {
+            request.setStatus("accepted");
+            friendRequestRepository.save(request);
 
-                user.getReceivedFriendRequests().remove(sender);
-                sender.getSentFriendRequests().remove(user);
+            // Add sender and receiver to each other's friends list
+            User sender = request.getSender();
+            User receiver = request.getReceiver();
 
-                userRepository.save(user);
-                userRepository.save(sender);
-                return true;
-            }
+            sender.getFriends().add(receiver);
+            receiver.getFriends().add(sender);
+
+            userRepository.save(sender);
+            userRepository.save(receiver);
+
+            return true;
         }
         return false;
     }
 
-    // Reject a friend request
-    public boolean rejectFriendRequest(Long userId, Long senderId) {
-        Optional<User> userOpt = userRepository.findById(userId);
-        Optional<User> senderOpt = userRepository.findById(senderId);
-
-        if (userOpt.isPresent() && senderOpt.isPresent()) {
-            User user = userOpt.get();
-            User sender = senderOpt.get();
-
-            if (user.getReceivedFriendRequests().contains(sender)) {
-                user.getReceivedFriendRequests().remove(sender);
-                sender.getSentFriendRequests().remove(user);
-
-                userRepository.save(user);
-                userRepository.save(sender);
-                return true;
-            }
+    public boolean rejectFriendRequest(Long requestId) {
+        FriendRequest request = friendRequestRepository.findById(requestId).orElse(null);
+        if (request != null) {
+            request.setStatus("rejected");
+            friendRequestRepository.save(request);
+            return true;
         }
         return false;
+    }
+
+    //    public List<UserDTO> getFriends(Long userId) {
+//        User user = userRepository.findById(userId).orElse(null);
+//
+//        if (user != null) {
+//            List<UserDTO> friendsDTOs = user.getFriends().stream()
+//                    .map(UserMapper::toDTO)
+//                    .collect(Collectors.toList());
+//
+//            // Log the number of friends
+//            System.out.println("Number of friends for user " + userId + ": " + friendsDTOs.size());
+//            return friendsDTOs;
+//        }
+//        return Collections.emptyList(); // or handle the case when the user is not found
+//    }
+    public List<UserDTO> getFriends(Long userId) {
+        User user = userRepository.findByIdWithFriends(userId).orElse(null);
+
+        if (user != null) {
+            List<UserDTO> friendsDTOs = user.getFriends().stream()
+                    .map(UserMapper::toDTO)
+                    .collect(Collectors.toList());
+
+            return friendsDTOs;
+        }
+        return Collections.emptyList();
+    }
+
+    public FriendRequestDTO getFriendRequestById(Long requestId) {
+        FriendRequest request = friendRequestRepository.findById(requestId).orElse(null);
+        if (request != null) {
+            return new FriendRequestDTO(
+                    request.getId(),
+                    request.getSender().getId(),
+                    request.getSender().getName(),
+                    request.getReceiver().getId(),  // Add this line to get the receiver's ID
+                    request.getStatus()
+            );
+        }
+        return null; // Handle case where request is not found
     }
 }

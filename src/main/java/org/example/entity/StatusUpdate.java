@@ -31,6 +31,10 @@ public class StatusUpdate {
     @OneToMany(mappedBy = "statusUpdate", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "upload_id")
+    private Upload uploads;
+
     public StatusUpdate() {
     }
 

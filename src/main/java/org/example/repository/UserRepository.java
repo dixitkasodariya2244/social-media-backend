@@ -26,4 +26,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
             + "OR u IN (SELECT f FROM User u JOIN u.followers f WHERE u.id = :users_id))")
     List<StatusUpdate> findAllRelevantStatusUpdates(@Param("users_id") Long userId);
 
+    // Find users by their name (case-insensitive, partial matches)
+    List<User> findByNameContainingIgnoreCase(String name);
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.friends WHERE u.id = :id")
+    Optional<User> findByIdWithFriends(@Param("id") Long id);
+
 }

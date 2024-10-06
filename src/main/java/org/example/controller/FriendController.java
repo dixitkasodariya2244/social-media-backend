@@ -14,10 +14,10 @@ public class FriendController {
     private FriendService friendService;
 
     // Get friends list of a user
-    @GetMapping("/{userId}")
-    public Set<UserDTO> getFriendsList(@PathVariable Long userId) {
-        return friendService.getFriendsList(userId);
-    }
+//    @GetMapping("/{userId}/friends")
+//    public Set<UserDTO> getFriendsList(@PathVariable Long userId) {
+//        return friendService.getFriendsList(userId);
+//    }
 
     // Remove a friend from the user's friends list
     @DeleteMapping("/{userId}/remove/{friendId}")
