@@ -49,4 +49,18 @@ public class ReactionService {
         }
         return 0;
     }
+    public Reaction getUserReaction(Long userId, Long statusUpdateId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        Optional<StatusUpdate> statusUpdateOptional = statusUpdateRepository.findById(statusUpdateId);
+
+        if (userOptional.isPresent() && statusUpdateOptional.isPresent()) {
+            User user = userOptional.get();
+            StatusUpdate statusUpdate = statusUpdateOptional.get();
+
+            // Fetch the reaction with a limit of 1
+            return reactionRepository.findByUserAndStatusUpdate(user, statusUpdate)
+                    .orElse(null);
+        }
+        return null;
+    }
 }

@@ -84,15 +84,6 @@ public class UserController {
             return ResponseEntity.status(401).build(); // Unauthorized
         }
     }
-    // Endpoint to get all relevant status updates
-//    @GetMapping("/{id}/home")
-//    public ResponseEntity<List<StatusUpdateDTO>> getUserHomePage(@PathVariable Long id) {
-//        List<StatusUpdate> statusUpdates = statusUpdateService.getAllRelevantStatusUpdates(id);
-//        List<StatusUpdateDTO> statusUpdateDTOs = statusUpdates.stream()
-//                .map(UserMapper::toStatusUpdateDTO)
-//                .collect(Collectors.toList());
-//        return ResponseEntity.ok(statusUpdateDTOs);
-//    }
 
     @GetMapping("/{id}/home")
     public ResponseEntity<UserDTO> getUserHomePage(@PathVariable Long id) {
@@ -111,15 +102,6 @@ public class UserController {
         }
     }
 
-    //    @GetMapping("/top-profiles")
-//    public ResponseEntity<List<UserDTO>> getTopProfiles() {
-//        // Assuming you have a method in userService to get top profiles
-//        List<User> users = userService.getTopProfiles();
-//        List<UserDTO> userDTOs = users.stream()
-//                .map(UserMapper::toDTO)
-//                .collect(Collectors.toList());
-//        return ResponseEntity.ok(userDTOs);
-//    }
 // Endpoint to search users by name
     @GetMapping("/search")
     public ResponseEntity<List<UserDTO>> searchUsersByName(@RequestParam String name) {

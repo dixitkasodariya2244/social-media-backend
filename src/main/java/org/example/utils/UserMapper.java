@@ -127,7 +127,6 @@ public class UserMapper {
         followerDTO.setId(follower.getId());
         followerDTO.setName(follower.getName());
 
-        // Map status updates
         List<StatusUpdateDTO> statusUpdates = follower.getStatusUpdates().stream()
                 .map(UserMapper::toStatusUpdateDTO)
                 .collect(Collectors.toList());
@@ -141,7 +140,6 @@ public class UserMapper {
         followingDTO.setId(followingUser.getId());
         followingDTO.setName(followingUser.getName());
 
-        // Map status updates
         List<StatusUpdateDTO> statusUpdates = followingUser.getStatusUpdates().stream()
                 .map(UserMapper::toStatusUpdateDTO)
                 .collect(Collectors.toList());

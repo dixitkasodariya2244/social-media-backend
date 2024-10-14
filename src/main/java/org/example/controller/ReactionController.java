@@ -39,4 +39,16 @@ public class ReactionController {
         int count = reactionService.countReactions(statusUpdateId, type);
         return ResponseEntity.ok(count);
     }
+    @GetMapping("/{userId}/{statusUpdateId}/user-reaction")
+    public ResponseEntity<ReactionDTO> getUserReaction(
+            @PathVariable Long userId,
+            @PathVariable Long statusUpdateId) {
+        Reaction reaction = reactionService.getUserReaction(userId, statusUpdateId);
+        if (reaction != null) {
+            ReactionDTO reactionDTO = UserMapper.toReactionDTO(reaction);
+            return ResponseEntity.ok(reactionDTO);
+        } else {
+            return ResponseEntity.ok(null); // No reaction found
+        }
+    }
 }

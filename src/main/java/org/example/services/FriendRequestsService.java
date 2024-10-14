@@ -37,7 +37,6 @@ public class FriendRequestsService {
 
     public List<FriendRequestDTO> getPendingRequests(Long userId) {
         List<FriendRequest> requests = friendRequestRepository.findByReceiverIdAndStatus(userId, "pending");
-
         // Map to DTO
         return requests.stream()
                 .map(request -> new FriendRequestDTO(
@@ -49,15 +48,6 @@ public class FriendRequestsService {
                 .collect(Collectors.toList());
     }
 
-    //    public boolean acceptFriendRequest(Long requestId) {
-//        FriendRequest request = friendRequestRepository.findById(requestId).orElse(null);
-//        if (request != null) {
-//            request.setStatus("accepted");
-//            friendRequestRepository.save(request);
-//            return true;
-//        }
-//        return false;
-//    }
     public boolean acceptFriendRequest(Long requestId) {
         FriendRequest request = friendRequestRepository.findById(requestId).orElse(null);
         if (request != null) {
@@ -89,20 +79,6 @@ public class FriendRequestsService {
         return false;
     }
 
-    //    public List<UserDTO> getFriends(Long userId) {
-//        User user = userRepository.findById(userId).orElse(null);
-//
-//        if (user != null) {
-//            List<UserDTO> friendsDTOs = user.getFriends().stream()
-//                    .map(UserMapper::toDTO)
-//                    .collect(Collectors.toList());
-//
-//            // Log the number of friends
-//            System.out.println("Number of friends for user " + userId + ": " + friendsDTOs.size());
-//            return friendsDTOs;
-//        }
-//        return Collections.emptyList(); // or handle the case when the user is not found
-//    }
     public List<UserDTO> getFriends(Long userId) {
         User user = userRepository.findByIdWithFriends(userId).orElse(null);
 

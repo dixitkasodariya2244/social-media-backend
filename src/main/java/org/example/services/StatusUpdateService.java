@@ -27,16 +27,6 @@ public class StatusUpdateService {
     private UserRepository userRepository;
 
 
-    // Post a status update
-//    public StatusUpdate postStatus(Long userId, String text) {
-//        Optional<User> userOptional = userRepository.findById(userId);
-//        if (userOptional.isPresent()) {
-//            User user = userOptional.get();
-//            StatusUpdate statusUpdate = new StatusUpdate(text, user);
-//            return statusUpdateRepository.save(statusUpdate);
-//        }
-//        return null;
-//    }
     public StatusUpdate postStatusWithUploads(Long userId, String text, MultipartFile file) throws IOException {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {

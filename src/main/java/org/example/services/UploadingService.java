@@ -51,17 +51,6 @@ public class UploadingService {
         return uploadRepository.findByUserId(userId);
     }
 
-    //downloading images with user id
-//    public byte[] downloadImage(Long userId, String fileName) {
-//        Optional<Upload> uploadOptional = uploadRepository.findById(userId);
-//        if (uploadOptional.isPresent()) {
-//            byte[] images = UploadUtils.decompressImage(uploadOptional.get().getImageData());
-//            return images;
-//        }else {
-//            // Handle the case where the image is not found or does not belong to the user
-//            throw new RuntimeException("Image not found for this user");
-//        }
-//    }
     public byte[] downloadImage(Long userId, String fileName) {
         Optional<Upload> uploadOptional = uploadRepository.findByUserIdAndFileName(userId, fileName); // Update query
         if (uploadOptional.isPresent()) {
@@ -75,11 +64,7 @@ public class UploadingService {
     public void deleteFile(Long uploadId) {
         Optional<Upload> uploadOptional = uploadRepository.findById(uploadId);
         if (uploadOptional.isPresent()) {
-            // Optionally delete the physical file from the file system here
-            // File file = new File(uploadOptional.get().getFileUrl());
-            // file.delete();
 
-            // Delete the upload record from the database
             uploadRepository.deleteById(uploadId);
         }
     }

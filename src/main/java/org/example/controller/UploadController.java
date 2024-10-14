@@ -83,13 +83,4 @@ public class UploadController {
         }
     }
 
-//    @PostMapping("/{userId}/delete/{fileName}")
-//    public ResponseEntity<?> deleteImage(@PathVariable Long userId, @PathVariable String fileName) {
-//        boolean isDeleted = uploadingService.deleteImage(userId, fileName);
-//        if (isDeleted) {
-//            return ResponseEntity.ok("Image deleted successfully.");
-//        } else {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image not found.");
-//        }
-//    }
 }

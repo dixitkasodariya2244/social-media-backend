@@ -1,6 +1,7 @@
 package org.example.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -46,7 +47,7 @@ public class User {
 
 //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 //    private Set<StatusUpdate> statusUpdates = new HashSet<>();
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<StatusUpdate> statusUpdates;
 
@@ -74,7 +75,7 @@ public class User {
     @JsonManagedReference
     private Set<User> receivedFriendRequests = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_following",
             joinColumns = @JoinColumn(name = "follower_id"),
@@ -82,7 +83,7 @@ public class User {
     )
     private Set<User> following = new HashSet<>();
 
-    @ManyToMany(mappedBy = "following")
-    @JsonBackReference
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "following")
+    @JsonIgnore // Ignore this field to prevent recursion but still allow serialization of other fields
     private Set<User> followers = new HashSet<>();
 }

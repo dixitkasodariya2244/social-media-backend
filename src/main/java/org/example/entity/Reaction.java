@@ -9,6 +9,9 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 @Builder
+@Table(name = "reactions", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"users_id", "status_update_id"})
+})
 public class Reaction {
 
     @Id

@@ -23,16 +23,6 @@ public class StatusController {
     @Autowired
     private StatusUpdateService statusUpdateService;
 
-    // Post a status update
-//    @PostMapping("/{userId}/status")
-//    public ResponseEntity<StatusUpdate> postStatus(@PathVariable Long userId, @RequestBody String text) {
-//        StatusUpdate statusUpdate = statusUpdateService.postStatus(userId, text);
-//        if (statusUpdate != null) {
-//            return ResponseEntity.ok(statusUpdate);
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
     @PostMapping("/{userId}/post")
     public ResponseEntity<StatusUpdate> postStatusWithUploads(
             @PathVariable Long userId,
@@ -51,14 +41,6 @@ public class StatusController {
         }
     }
 
-//    @GetMapping("/{userId}/post")
-//    public ResponseEntity<UserDTO> getUserWithStatusUpdates(@PathVariable Long userId) {
-//        Optional<User> user = userService.getUserByIdWithStatusUpdates(userId);
-//        return user.map(UserMapper::toDTO)
-//                .map(ResponseEntity::ok)
-//                .orElseGet(() -> ResponseEntity.notFound().build());
-////        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-//    }
 @GetMapping("/{userId}/post")
 public ResponseEntity<UserDTO> getUserWithStatusUpdates(@PathVariable Long userId) {
     Optional<User> user = userService.getUserByIdWithStatusUpdates(userId);
